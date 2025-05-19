@@ -15,12 +15,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import { useWallet } from "@/hooks/use-wallet"
+import { useSolanaWallet } from "@/hooks/use-solana-wallet"
 import { useGridStore } from "@/hooks/use-grid-store"
 
 export default function MarketplaceList() {
   const { toast } = useToast()
-  const { connected } = useWallet()
+  const { connected } = useSolanaWallet()
   const { grid, purchaseFromUser, loading } = useGridStore()
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null)
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false)

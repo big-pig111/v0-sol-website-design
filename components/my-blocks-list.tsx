@@ -19,12 +19,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { useWallet } from "@/hooks/use-wallet"
+import { useSolanaWallet } from "@/hooks/use-solana-wallet"
 import { useGridStore } from "@/hooks/use-grid-store"
 
 export default function MyBlocksList() {
   const { toast } = useToast()
-  const { connected, publicKey } = useWallet()
+  const { connected, publicKey } = useSolanaWallet()
   const { grid, uploadImage, listForSale, loading } = useGridStore()
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)

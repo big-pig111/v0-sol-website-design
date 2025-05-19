@@ -15,12 +15,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import { useWallet } from "@/hooks/use-wallet"
+import { useSolanaWallet } from "@/hooks/use-solana-wallet"
 import { useGridStore } from "@/hooks/use-grid-store"
 
 export default function MarketplaceDisplay() {
   const { toast } = useToast()
-  const { connected } = useWallet()
+  const { connected, publicKey, connection, sendTransaction } = useSolanaWallet()
   const { grid, purchaseFromUser, loading } = useGridStore()
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null)
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false)
@@ -37,18 +37,18 @@ export default function MarketplaceDisplay() {
     if (selectedBlock === null) return
 
     try {
-      await purchaseFromUser(selectedBlock)
-      toast({
-        title: "Block purchased!",
-        description: "You can now upload an image to your block",
-      })
+      const showToast = (title: string, description: string, variant: "default" | "destructive" = "default") => {
+        toast({
+          title,
+          description,
+          variant,
+        })
+      }
+
+      await purchaseFromUser(selectedBlock, publicKey, connection, sendTransaction, showToast)
       setPurchaseDialogOpen(false)
     } catch (error) {
-      toast({
-        title: "Purchase failed",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      })
+      console.error("Purchase error:", error)
     }
   }
 

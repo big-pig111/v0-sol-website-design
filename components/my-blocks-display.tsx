@@ -19,12 +19,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { useWallet } from "@/hooks/use-wallet"
+import { useSolanaWallet } from "@/hooks/use-solana-wallet"
 import { useGridStore } from "@/hooks/use-grid-store"
 
 export default function MyBlocksDisplay() {
   const { toast } = useToast()
-  const { connected, publicKey } = useWallet()
+  const { connected, publicKey, connection, sendTransaction } = useSolanaWallet()
   const { grid, uploadImage, listForSale, loading } = useGridStore()
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
@@ -46,18 +46,18 @@ export default function MyBlocksDisplay() {
 
     try {
       const file = fileInputRef.current.files[0]
-      await uploadImage(selectedBlock, file)
-      toast({
-        title: "Image uploaded!",
-        description: "Your image has been successfully uploaded to the block",
-      })
+      const showToast = (title: string, description: string, variant: "default" | "destructive" = "default") => {
+        toast({
+          title,
+          description,
+          variant,
+        })
+      }
+
+      await uploadImage(selectedBlock, file, publicKey, showToast)
       setUploadDialogOpen(false)
     } catch (error) {
-      toast({
-        title: "Upload failed",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      })
+      console.error("Upload error:", error)
     }
   }
 
@@ -71,13 +71,18 @@ export default function MyBlocksDisplay() {
         throw new Error("Please enter a valid price")
       }
 
-      await listForSale(selectedBlock, priceValue)
-      toast({
-        title: "Block listed for sale!",
-        description: `Your block is now available for ${priceValue} SOL`,
-      })
+      const showToast = (title: string, description: string, variant: "default" | "destructive" = "default") => {
+        toast({
+          title,
+          description,
+          variant,
+        })
+      }
+
+      await listForSale(selectedBlock, priceValue, publicKey, connection, sendTransaction, showToast)
       setSellDialogOpen(false)
     } catch (error) {
+      console.error("Listing error:", error)
       toast({
         title: "Listing failed",
         description: error instanceof Error ? error.message : "Unknown error occurred",
@@ -269,8 +274,8 @@ export default function MyBlocksDisplay() {
               <Input
                 id="price"
                 type="number"
-                step="0.1"
-                min="0.1"
+                step="0.001"
+                min="0.001"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 required

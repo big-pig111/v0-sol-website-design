@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react"
 import { Clock } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useWallet } from "@/hooks/use-wallet"
+import { useSolanaWallet } from "@/hooks/use-solana-wallet"
 import { useGridStore } from "@/hooks/use-grid-store"
 
 export default function AirdropCountdown() {
   const [timeLeft, setTimeLeft] = useState<string>("00:00:00")
   const [isAirdropping, setIsAirdropping] = useState(false)
   const { toast } = useToast()
-  const { connected, publicKey } = useWallet()
+  const { connected, publicKey } = useSolanaWallet()
   const { grid } = useGridStore()
 
   // Check if the current user owns any grid blocks

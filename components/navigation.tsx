@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Grid, ShoppingBag, Layers, Menu, X } from "lucide-react"
+import { Grid, ShoppingBag, Layers, Menu, X, Wallet } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import WalletConnectButton from "@/components/wallet-connect-button"
@@ -16,6 +16,7 @@ export default function Navigation() {
     { name: "Grid", href: "/grid", icon: <Grid className="h-4 w-4 mr-2" /> },
     { name: "Marketplace", href: "/marketplace", icon: <ShoppingBag className="h-4 w-4 mr-2" /> },
     { name: "My Blocks", href: "/my-blocks", icon: <Layers className="h-4 w-4 mr-2" /> },
+    { name: "Wallet", href: "/wallet", icon: <Wallet className="h-4 w-4 mr-2" /> },
   ]
 
   return (

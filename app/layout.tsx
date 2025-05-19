@@ -4,7 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 
 import { ThemeProvider } from "@/components/theme-provider"
-import { WalletProvider } from "@/hooks/use-wallet"
+import { WalletProvider } from "@/providers/wallet-provider"
 import { Toaster } from "@/components/ui/toaster"
 import Navigation from "@/components/navigation"
 
@@ -28,7 +28,7 @@ export default function RootLayout({
           <WalletProvider>
             <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white">
               <Navigation />
-              <main className="h-[calc(100vh-4rem)] overflow-hidden">{children}</main>
+              <main className="h-[calc(100vh-4rem)] overflow-auto">{children}</main>
               <Toaster />
             </div>
           </WalletProvider>

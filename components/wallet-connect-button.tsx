@@ -5,14 +5,14 @@ import { Wallet } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useWallet } from "@/hooks/use-wallet"
+import { useSolanaWallet } from "@/hooks/use-solana-wallet"
 
 interface WalletConnectButtonProps {
   className?: string
 }
 
 export default function WalletConnectButton({ className }: WalletConnectButtonProps) {
-  const { connected, publicKey, connect, disconnect } = useWallet()
+  const { connected, publicKey, connect, disconnect, balance } = useSolanaWallet()
   const [mounted, setMounted] = useState(false)
 
   // Prevent hydration errors
@@ -40,9 +40,18 @@ export default function WalletConnectButton({ className }: WalletConnectButtonPr
           >
             <Wallet className="mr-2 h-4 w-4" />
             {publicKey.toString().slice(0, 4)}...{publicKey.toString().slice(-4)}
+            {balance !== null && ` (${balance.toFixed(2)} SOL)`}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="bg-gray-900 border-gray-800">
+          <DropdownMenuItem
+            className="text-gray-300 focus:text-gray-300 focus:bg-gray-800"
+            onClick={() =>
+              window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=devnet`, "_blank")
+            }
+          >
+            View on Explorer
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={disconnect} className="text-red-400 focus:text-red-400 focus:bg-gray-800">
             Disconnect
           </DropdownMenuItem>

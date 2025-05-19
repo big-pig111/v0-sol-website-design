@@ -14,12 +14,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import { useWallet } from "@/hooks/use-wallet"
+import { useSolanaWallet } from "@/hooks/use-solana-wallet"
 import { useGridStore } from "@/hooks/use-grid-store"
 
 export default function GridMarketplace() {
   const { toast } = useToast()
-  const { connected } = useWallet()
+  const { connected } = useSolanaWallet()
   const { grid, purchaseBlock, loading } = useGridStore()
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null)
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false)
@@ -60,7 +60,7 @@ export default function GridMarketplace() {
   const getBlockPrice = (index: number) => {
     const soldBlocks = grid.filter((block) => block.owner !== null).length
     const tier = Math.floor(soldBlocks / 10)
-    return 0.1 + tier * 0.1
+    return 0.005 + tier * 0.005 // Initial price and increment reduced to 0.005 SOL
   }
 
   return (

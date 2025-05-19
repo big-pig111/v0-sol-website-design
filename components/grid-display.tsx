@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import { useWallet } from "@/hooks/use-wallet"
+import { useSolanaWallet } from "@/hooks/use-solana-wallet"
 import { useGridStore } from "@/hooks/use-grid-store"
 
 // Initial owner wallet address
@@ -22,7 +22,7 @@ const INITIAL_OWNER_WALLET = "4RoLEw2ecABi5Q5oqVybgaR3xtdFEpiN79tKYJ5txpff"
 
 export default function GridDisplay() {
   const { toast } = useToast()
-  const { connected, publicKey } = useWallet()
+  const { connected, publicKey, connection, sendTransaction } = useSolanaWallet()
   const { grid, purchaseBlock, loading } = useGridStore()
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null)
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false)
@@ -64,18 +64,18 @@ export default function GridDisplay() {
     if (selectedBlock === null) return
 
     try {
-      await purchaseBlock(selectedBlock)
-      toast({
-        title: "Block purchased!",
-        description: "You can now upload an image to your block",
-      })
+      const showToast = (title: string, description: string, variant: "default" | "destructive" = "default") => {
+        toast({
+          title,
+          description,
+          variant,
+        })
+      }
+
+      await purchaseBlock(selectedBlock, publicKey, connection, sendTransaction, showToast)
       setPurchaseDialogOpen(false)
     } catch (error) {
-      toast({
-        title: "Purchase failed",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      })
+      console.error("Purchase error:", error)
     }
   }
 
@@ -87,7 +87,7 @@ export default function GridDisplay() {
     // Default pricing logic for new blocks
     const soldBlocks = grid.filter((block) => block.owner !== INITIAL_OWNER_WALLET).length
     const tier = Math.floor(soldBlocks / 10)
-    return 0.1 + tier * 0.1
+    return 0.005 + tier * 0.005 // Initial price and increment reduced to 0.005 SOL
   }
 
   // Calculate how many blocks have been sold (not owned by initial owner)
@@ -131,7 +131,7 @@ export default function GridDisplay() {
               )}
               {isForSale && (
                 <div className="absolute bottom-0 right-0 bg-green-500/80 text-white text-[8px] px-1 rounded-tl">
-                  {block.price} SOL
+                  {getBlockPrice(index)} SOL
                 </div>
               )}
             </div>
@@ -161,13 +161,11 @@ export default function GridDisplay() {
             <DialogDescription className="text-gray-400">
               {selectedBlock !== null && grid[selectedBlock].owner === INITIAL_OWNER_WALLET ? (
                 <span>
-                  This is an initial sale. Payment of {selectedBlock !== null ? getBlockPrice(selectedBlock) : 0} SOL
-                  will go to the initial owner.
+                  This is an initial sale. Payment of {getBlockPrice(selectedBlock)} SOL will go to the initial owner.
                 </span>
               ) : (
                 <span>
-                  This block costs {selectedBlock !== null ? getBlockPrice(selectedBlock) : 0} SOL. Once purchased, you
-                  can upload your own image.
+                  This block costs {getBlockPrice(selectedBlock)} SOL. Once purchased, you can upload your own image.
                 </span>
               )}
             </DialogDescription>
